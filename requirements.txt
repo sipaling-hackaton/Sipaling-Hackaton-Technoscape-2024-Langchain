@@ -1,0 +1,13 @@
+argparse
+langchain
+langchain-community
+langchain-mongodb
+langchain-openai
+langchain-google-genai
+lxml
+pymongo
+requests
+bs4
+openai
+tiktoken
+fastapi
