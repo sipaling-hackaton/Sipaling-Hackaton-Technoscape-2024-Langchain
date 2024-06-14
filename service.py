@@ -3,10 +3,12 @@ from pymongo import MongoClient
 from langchain.document_loaders import WebBaseLoader
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
+
+# from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
-from langchain_openai.chat_models import ChatOpenAI
+from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
 
 
 async def get_references(client: MongoClient):
@@ -31,7 +33,7 @@ def init_datasource(client: MongoClient, sources: list):
     )
     docs = text_splitter.split_documents(data)
 
-    embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
+    embeddings = ChatGoogleGenerativeAI(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
     collection = db[os.getenv("COLLECTION_NAME")]
 
@@ -51,7 +53,9 @@ def gpt_ask(client: MongoClient, question: str):
     col = db[os.getenv("COLLECTION_NAME")]
     vector_store = MongoDBAtlasVectorSearch(
         col,
-        OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY")),
+        GoogleGenerativeAIEmbeddings(
+            model="gemini-pro", google_api_key=os.getenv("OPENAI_API_KEY")
+        ),
         index_name=os.getenv("INDEX_NAME"),
     )
     docs = vector_store.max_marginal_relevance_search(question, k=2)
@@ -78,8 +82,8 @@ def gpt_ask(client: MongoClient, question: str):
 
     combined_ctx = "\n\n".join([doc.page_content for doc in docs])
 
-    model = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"), temperature=1, max_tokens=1000
+    model = ChatGoogleGenerativeAI(
+        google_api_key=os.getenv("OPENAI_API_KEY"), temperature=1, max_tokens=1000
     )
     llm_chain = LLMChain(llm=model, prompt=prompt_template)
     response = llm_chain.invoke(
