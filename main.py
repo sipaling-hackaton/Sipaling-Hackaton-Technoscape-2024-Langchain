@@ -10,6 +10,9 @@ import os
 import json
 from bson import json_util
 import warnings
+import logging
+
+logger = logging.getLogger("uvicorn")
 
 warnings.filterwarnings("ignore", category=UserWarning, module="langchain.chains.llm")
 load_dotenv()
@@ -47,6 +50,15 @@ async def test():
     return {"references": references}
 
 
+@app.post("/reset-data", tags=["engine"], summary="Reset the data source")
+async def reset_data():
+    try:
+        await service.reset_datasource(client)
+        return {"status": "ok", "message": "reset"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 @app.post(
     "/init",
     tags=["engine"],
@@ -56,7 +68,7 @@ async def test():
 async def init():
     try:
         sources = await service.get_references(client)
-        docsearch = service.init_datasource(client, sources)
+        docsearch = await service.init_datasource(client, sources)
         return {
             "status": "ok",
             "message": "initialized",
@@ -64,6 +76,7 @@ async def init():
             "collection_name": os.getenv("COLLECTION_NAME"),
         }
     except Exception as e:
+        logger.error(e)
         return {"status": "error", "message": str(e)}
 
 

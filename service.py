@@ -1,6 +1,6 @@
 import os
 from pymongo import MongoClient
-from langchain.document_loaders import WebBaseLoader
+from langchain.document_loaders import WebBaseLoader, PyPDFLoader
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -8,8 +8,12 @@ from langchain.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from langchain_openai.chat_models import ChatOpenAI
 import logging
+from langchain.cache import SQLiteCache
+from langchain.globals import set_llm_cache
+import util
 
 logger = logging.getLogger("uvicorn")
+set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
 
 async def get_references(client: MongoClient):
@@ -19,7 +23,15 @@ async def get_references(client: MongoClient):
     return list(references)
 
 
-def init_datasource(client: MongoClient, sources: list):
+async def reset_datasource(client: MongoClient):
+    app_db = client[os.getenv("APP_DB_NAME")]
+    ds_db = client[os.getenv("DS_DB_NAME")]
+    collections = [app_db["Reference"], ds_db[os.getenv("COLLECTION_NAME")]]
+    for collection in collections:
+        collection.delete_many({})
+
+
+async def init_datasource(client: MongoClient, sources: list):
     db = client[os.getenv("DS_DB_NAME")]
     collection = db[os.getenv("COLLECTION_NAME")]
 
@@ -34,16 +46,16 @@ def init_datasource(client: MongoClient, sources: list):
     data = []
     for source in sources:
         logger.info(f"Loading data from {source['url']}")
-        is_source_exists = collection.find_one({"source": source["url"]})
+        is_source_exists = collection.find_one({"source": {"$regex": source["url"]}})
         if is_source_exists is not None:
             logger.info(f"Source {source['url']} already exists in the collection")
             continue
-        data.extend(WebBaseLoader(source["url"]).load())
+        if source["datatype"] == "pdf":
+            data.extend(util.load_pdf_from_gcs(source["url"]).load())
+        elif source["type"] == "website":
+            data.extend(WebBaseLoader(source["url"]).load())
 
     docs = text_splitter.split_documents(data)
-
-    # reset the collection
-    # collection.delete_many({})
 
     # insert the documents into the collection with the embeddings
     docsearch = MongoDBAtlasVectorSearch.from_documents(
@@ -85,10 +97,10 @@ possible answer:
 
     combined_ctx = "\n\n".join([doc.page_content for doc in docs])
 
-    model = ChatOpenAI(
+    llm = ChatOpenAI(
         openai_api_key=os.getenv("OPENAI_API_KEY"), temperature=1, max_tokens=1000
     )
-    llm_chain = LLMChain(llm=model, prompt=prompt_template)
+    llm_chain = LLMChain(llm=llm, prompt=prompt_template)
     response = llm_chain.invoke(
         {
             "question": question,

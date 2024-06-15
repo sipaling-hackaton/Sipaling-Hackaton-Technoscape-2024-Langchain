@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "adrian-project-412907",
+  "private_key_id": "5c0028c1f9df25f1c88d8b4d5a6e886e62e12370",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDLTQaD7Sm8QPxk\n0dfCw3/+d53WsbPgjv6jH2DitmhuwpYf1QauDkUgiyyKfrN7fWQlZJy3d8odgv7T\n6zdgYGqQMsRpW3qpVHE1VdUODrjeIHvNs9Y92985Rpn6m4ZjDKSOiY0tjbNm80d7\nHH6s4u/498hAkZ90SSu/o2+XISVrhurJeBr7Sb5LuLX8TWbPNpMT4JV04lnqKUh6\nWBQm/SBwBu1oUqPPF/FVagC5vHCjRboxxChxHmL5VyfKOe1+wi+8pPNZRns5+Kje\n3A6L5gYPtD8Bg0oxZTOKf8KuMcErYglJfa2oZZXZAvZiigpzz9rW/Vfo5QKLeAoO\n3ca8QurLAgMBAAECggEAERh2Dsv3sXvpfXTj5t3XuodGf5JL5PtBUGhIFmhuWboF\nM8IPIL3UdEsfwLms0BqYPEi8oPTyyw6D7UAfVPxmmZ+bQpzNsMWIC4sfMmJsi0lB\n/+c6gdMmb0OPmTJQ161tfQr2EzmSN3sHrMOVp2Yh9daoQT29oeKxShktPhEse2Ej\ni8HFQPHtgeNO8R/Ac+ojNUKcAs5vXR1+QwzEyuajATZfg4WdmF0aCV4ZkB7TQEcP\nSO36XTLUkRPghloe9ZriuwVxrSBN2ZAvb7rcn/prjnvKP0+TWZFTpJpniViXp3IG\nBQeRucvbwnVmuJ/9wyKMtMjr+e0u+yEDaNhmT54vEQKBgQD2a85EH5QL4u9Mx5Pu\nM9hFgX0FbD87e6kyAR0KBIVkZeGAuHtVTYpvnRAj+Rz1MlhA9QBMHstw7bfDdqUg\nx5q9naYiUipDAbNZEnlRQtyXKK4NqTN6oDszUmkI5lVW6SsY+O3F+QuCcl9xz1k/\nNe/nJxNDeNuks59aId/52vTFowKBgQDTNB7ChnX9TKUjsV70ax+KOGs29wLNoAaB\nAq6q1FCIcBeMR4yPH128IriVEN/8zoPcXhsVuo3zfV1DDkpeQ5Zb3+eassDZOwKD\nUXVZss6lWWu0PlpfDWSpH7Lwa6WN+pmJMASa7an+qxoyHtcfXITdpzLV62g6G0u5\npBHcTTEIuQKBgQDalPQpX21+QbWNALeKovhjZyIT7loElIOXtH8ixLHiRbEK8hmM\nqDR1HvgTQMTcBuVb8TdrTiGdsW/A9XwyIHx1V+LnLMUKHPcOuqFcYJe1icMioQTl\n8D2zH5XF7DKk3j15cE3Rv0DjXDqnhIqg1GJSQ0oGHq2OYjqmw8eeJQfcSwKBgQDE\nvlaxKwSas11ahI5J7chxv+DQUQYBesLURyVi6Wkj0Bd/i986LCPrcAS2iAO/wrk+\n/UMJ2MEHQ48vOg65BQj6CPf9Oes/8SKEJcvFhTXO/h/Axhz1UsqkaW0NXZnZSsrf\n6yU/FYo4PDeo3OXUxyDWQjyu3h43ktnV0yr4J8g3sQKBgQCJpAnoDaLfgYiYZgud\niFpkFkmpYFxBOWFNrvVM81zoUie5ZRrwVS00Dj/BnI8wpXQi/9Kok482eUxtzVyb\nXSMVUFJQgDK5vhKXV2ZiTakfk3wNoI5Zl1l87x4yviVBUI9VtZ1rMYTqiZvwAgWI\nV/9G3QYC1hxeYi1/G+wsOkqO3w==\n-----END PRIVATE KEY-----\n",
+  "client_email": "teleperformance-crm-sa@adrian-project-412907.iam.gserviceaccount.com",
+  "client_id": "112551573055425887483",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/teleperformance-crm-sa%40adrian-project-412907.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
