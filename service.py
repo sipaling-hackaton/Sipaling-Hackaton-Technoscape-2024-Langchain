@@ -7,6 +7,9 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 from langchain_openai.chat_models import ChatOpenAI
+import logging
+
+logger = logging.getLogger("uvicorn")
 
 
 async def get_references(client: MongoClient):
@@ -18,10 +21,7 @@ async def get_references(client: MongoClient):
 
 def init_datasource(client: MongoClient, sources: list):
     db = client[os.getenv("DS_DB_NAME")]
-
-    data = []
-    for source in sources:
-        data.extend(WebBaseLoader(source["url"]).load())
+    collection = db[os.getenv("COLLECTION_NAME")]
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
@@ -29,14 +29,21 @@ def init_datasource(client: MongoClient, sources: list):
         separators=["\n\n", "\n", "(?<=\. )", " "],
         length_function=len,
     )
-    docs = text_splitter.split_documents(data)
-
     embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
-    collection = db[os.getenv("COLLECTION_NAME")]
+    data = []
+    for source in sources:
+        logger.info(f"Loading data from {source['url']}")
+        is_source_exists = collection.find_one({"source": source["url"]})
+        if is_source_exists is not None:
+            logger.info(f"Source {source['url']} already exists in the collection")
+            continue
+        data.extend(WebBaseLoader(source["url"]).load())
+
+    docs = text_splitter.split_documents(data)
 
     # reset the collection
-    collection.delete_many({})
+    # collection.delete_many({})
 
     # insert the documents into the collection with the embeddings
     docsearch = MongoDBAtlasVectorSearch.from_documents(
@@ -54,25 +61,25 @@ def gpt_ask(client: MongoClient, question: str):
         OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY")),
         index_name=os.getenv("INDEX_NAME"),
     )
-    docs = vector_store.max_marginal_relevance_search(question, k=2)
+    docs = vector_store.max_marginal_relevance_search(question, k=3)
 
     prompt_template = PromptTemplate(
         input_variables=["question", "context"],
         template="""
-            You are an intelligent assistant who helps answer customer questions. Input provided by customers is in the form of questions in various forms and can consist of several questions. You need to parse user input to select an existing question.
+You are an intelligent assistant who helps answer customer questions. Input provided by customers is in the form of questions in various forms and can consist of several questions. You need to parse user input to select an existing question.
 
-            example question:
-            [4:51 PM, 6/13/2024] +62 895-0450-4930: Hello good afternoon, I want to ask. What is Teleperformance?
-            [4:52 PM, 6/13/2024] +62 895-0450-4930: What is the company's line of work?
-            then the customer's question is:
-            1. What is Teleperformance?
-            2. What is the field of work of the Teleperformance company?
+example question:
+[4:51 PM, 6/13/2024] +62 895-0450-4930: Hello good afternoon, I want to ask. What is Teleperformance?
+[4:52 PM, 6/13/2024] +62 895-0450-4930: What is the company's line of work?
+then the customer's question is:
+1. What is Teleperformance?
+2. What is the field of work of the Teleperformance company?
 
-            After knowing the questions, answer each question based on the available evidence. If the evidence provided is still not supportive, try to answer as best as you can based on your knowledge. Return the answer plainly, without any formatting. Now let's get to work.
+After knowing the questions, answer each question based on the available evidence. If the evidence provided is still not supportive, just say you dont know. Return answers in a neat format and in the same language as entered.
 
-            customer input: {question} 
-            known facts: {context} 
-            possible answer:
+customer input: {question} 
+known facts: {context} 
+possible answer:
     """,
     )
 

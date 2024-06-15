@@ -1,13 +1,11 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /opt
 
-COPY requirements.txt /app/requirements.txt
+COPY requirements.txt /opt/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /opt/requirements.txt
 
-COPY . /app
+COPY . /opt
 
-EXPOSE 80
-
-CMD ["fastapi", "run", "app/main.py", "--port", "80"]
+CMD ["fastapi", "run", "main.py", "--port", "8080", "--host", "0.0.0.0"]

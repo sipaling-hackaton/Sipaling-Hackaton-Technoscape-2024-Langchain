@@ -3,7 +3,6 @@ langchain
 langchain-community
 langchain-mongodb
 langchain-openai
-langchain-google-genai
 lxml
 pymongo
 requests
